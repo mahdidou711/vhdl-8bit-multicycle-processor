@@ -142,7 +142,7 @@ begin
                 
                 when FETCH =>
                     IR   <= ROM(PC); -- Lire l'instruction a l'adresse PC
-                    PC   <= PC + 1;              -- Incrementer PC vers l'instruction suivante
+                    PC   <= (PC + 1) mod 16;     -- Incrementer PC vers l'instruction suivante
                     etat <= DECODE;              -- Passer au decodage
 
                 -- DECODE 
