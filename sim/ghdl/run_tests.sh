@@ -65,7 +65,7 @@ TESTS=(
     "sqrt16|tb_sqrt16||pass"
     "ual_8|tb_ual_8||pass"
     "proc_8_program|tb_proc_8|-gRUN_TO_HALT=false|pass"
-    "proc_8_halt|tb_proc_8|-gRUN_TO_HALT=true|KD-001"
+    "proc_8_halt|tb_proc_8|-gRUN_TO_HALT=true|pass"
 )
 
 # Known baseline defects: signature that must ALL be present in the log
