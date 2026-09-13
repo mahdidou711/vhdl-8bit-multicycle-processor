@@ -167,7 +167,7 @@ begin
                     else
                         B <= ROM(PC); -- Charger immediat dans B
                     end if;
-                    PC   <= PC + 1; -- Avancer PC apres l'immediat
+                    PC   <= (PC + 1) mod 16; -- Avancer PC apres l'immediat
                     etat <= FETCH;  -- Reprendre le cycle fetch
 
                 
