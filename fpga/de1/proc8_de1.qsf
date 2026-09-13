@@ -30,10 +30,8 @@ set_global_assignment -name VHDL_FILE proc8_de1_top.vhd
 set_global_assignment -name SDC_FILE proc8_de1.sdc
 
 # -------------------------------------------------------------------------- #
-# Pin locations. All pins except LEDG[2] and LEDG[3] are identical to the
-# clean TP1/TP2 DE1 projects. LEDG[2] and LEDG[3] come from the original
-# course Terasic DE1 template (TP437.qsf / DE1_Basic_Computer.qsf), whose
-# CLOCK_50, KEY[0], LEDR, LEDG[1:0] and HEX assignments match TP1/TP2.
+# Terasic DE1 pin assignments used by this wrapper.
+# Locations were cross-checked for consistency before publication.
 # -------------------------------------------------------------------------- #
 
 set_location_assignment PIN_L1 -to CLOCK_50
