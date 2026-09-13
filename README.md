@@ -1,5 +1,7 @@
 # 8-bit Multicycle Processor in VHDL
 
+[![GHDL verification](https://github.com/mahdidou711/vhdl-8bit-multicycle-processor/actions/workflows/ghdl.yml/badge.svg)](https://github.com/mahdidou711/vhdl-8bit-multicycle-processor/actions/workflows/ghdl.yml)
+
 A minimal 8-bit multicycle processor with a fixed internal program ROM. It is
 written in VHDL, checked by a self-checking GHDL test suite (1,573,888
 exhaustive vectors plus clock-accurate processor checks) and packaged as a
