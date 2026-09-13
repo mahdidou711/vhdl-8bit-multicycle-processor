@@ -22,10 +22,8 @@
 #
 # Test outcomes:
 #   PASS   testbench printed "TB_RESULT <name> PASS" and GHDL exited with status 0
-#   XFAIL  known baseline defect reproduced with its exact signature
-#   XPASS  known defect no longer reproduces (expectation must be updated) -> failure
 #   FAIL   anything else
-# Exit status is 0 only if there is no FAIL and no XPASS.
+# Exit status is 0 only if there is no FAIL.
 
 set -euo pipefail
 
@@ -56,41 +54,17 @@ TB_FILES=(
     tb/tb_proc_8.vhd
 )
 
-# name|top-level unit|runtime generic|expectation
+# name|top-level unit|runtime generic
 TESTS=(
-    "addsub_8|tb_addsub_8||pass"
-    "logic_8|tb_logic_8||pass"
-    "shifter_8|tb_shifter_8||pass"
-    "mult_shift_add|tb_mult_shift_add||pass"
-    "sqrt16|tb_sqrt16||pass"
-    "ual_8|tb_ual_8||pass"
-    "proc_8_program|tb_proc_8|-gRUN_TO_HALT=false|pass"
-    "proc_8_halt|tb_proc_8|-gRUN_TO_HALT=true|pass"
+    "addsub_8|tb_addsub_8|"
+    "logic_8|tb_logic_8|"
+    "shifter_8|tb_shifter_8|"
+    "mult_shift_add|tb_mult_shift_add|"
+    "sqrt16|tb_sqrt16|"
+    "ual_8|tb_ual_8|"
+    "proc_8_program|tb_proc_8|-gRUN_TO_HALT=false"
+    "proc_8_halt|tb_proc_8|-gRUN_TO_HALT=true"
 )
-
-# Known baseline defects: signature that must ALL be present in the log
-kd_signature_ok() {
-    local id="$1" log="$2"
-    case "$id" in
-        KD-001)
-            # FETCH with PC=15 executes PC <= PC + 1 before HALT is decoded;
-            # PC is "integer range 0 to 15" -> bound check failure at proc_8.vhd:145.
-            grep -q "KD-001 PROBE: 11 results verified" "$log" &&
-            grep -Eq "bound check failure at .*rtl/proc_8\.vhd:145" "$log" &&
-            ! grep -q "MISMATCH" "$log"
-            ;;
-        *)
-            return 1
-            ;;
-    esac
-}
-
-kd_description() {
-    case "$1" in
-        KD-001) echo "PC overflow at FETCH of ROM[15] before HALT decode (rtl/proc_8.vhd:145)" ;;
-        *)      echo "unknown defect id" ;;
-    esac
-}
 
 command -v "$GHDL" >/dev/null 2>&1 || { echo "error: '$GHDL' not found" >&2; exit 2; }
 
@@ -145,11 +119,11 @@ echo "Simulation build        (${SIM_FLAGS[*]})"
 analyze_all "$WORK/sim" "${SIM_FLAGS[@]}"
 echo
 
-n_pass=0; n_xfail=0; n_fail=0; n_xpass=0
+n_pass=0; n_fail=0
 FAILED=()
 
 for entry in "${SELECTED[@]}"; do
-    IFS='|' read -r name top generic expect <<<"$entry"
+    IFS='|' read -r name top generic <<<"$entry"
     log="$WORK/logs/$name.log"
     args=("$top")
     [[ -n "$generic" ]] && args+=("$generic")
@@ -164,39 +138,22 @@ for entry in "${SELECTED[@]}"; do
     passed=0
     [[ $rc -eq 0 && "$result_line" == *" PASS "* ]] && passed=1
 
-    if [[ "$expect" == "pass" ]]; then
-        if [[ $passed -eq 1 ]]; then
-            status="PASS "; n_pass=$((n_pass + 1)); detail="$counts"
-        else
-            status="FAIL "; n_fail=$((n_fail + 1)); detail="exit=$rc ${counts:-no TB_RESULT line}"
-            FAILED+=("$name")
-        fi
+    if [[ $passed -eq 1 ]]; then
+        status="PASS "; n_pass=$((n_pass + 1)); detail="$counts"
     else
-        if [[ $passed -eq 1 ]]; then
-            status="XPASS"; n_xpass=$((n_xpass + 1))
-            detail="$expect no longer reproduces; update the expectation in run_tests.sh ($counts)"
-            FAILED+=("$name")
-        elif [[ $rc -ne 0 ]] && kd_signature_ok "$expect" "$log"; then
-            status="XFAIL"; n_xfail=$((n_xfail + 1))
-            detail="$expect reproduced: $(kd_description "$expect")"
-        else
-            status="FAIL "; n_fail=$((n_fail + 1))
-            detail="exit=$rc, $expect signature not matched"
-            FAILED+=("$name")
-        fi
+        status="FAIL "; n_fail=$((n_fail + 1)); detail="exit=$rc ${counts:-no TB_RESULT line}"
+        FAILED+=("$name")
     fi
 
     printf '[%s] %-16s %6d ms  %s\n' "$status" "$name" "$ms" "$detail"
-    if [[ "$status" == "XFAIL" ]]; then
-        grep -E "bound check failure|in process" "$log" | sed 's/^/          | /'
-    elif [[ "$status" != "PASS " ]]; then
+    if [[ "$status" != "PASS " ]]; then
         tail -n 15 "$log" | sed 's/^/          | /'
     fi
 done
 
 echo
-echo "Summary: $n_pass passed, $n_xfail expected failure(s) (known defects), $n_fail failed, $n_xpass unexpectedly passed"
-if [[ $n_fail -ne 0 || $n_xpass -ne 0 ]]; then
+echo "Summary: $n_pass passed, $n_fail failed"
+if [[ $n_fail -ne 0 ]]; then
     echo "RESULT: FAIL (${FAILED[*]})"
     exit 1
 fi

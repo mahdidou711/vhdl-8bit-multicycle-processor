@@ -20,10 +20,8 @@
 --   true  (halt)    : reset, full run of the 11 results, FETCH/DECODE of ROM[15]
 --                     (0xFF), then 200 edges of HALT with frozen outputs (more than
 --                     one complete program pass, so a restart would be detected).
---                     On the original RTL this reproduces known defect KD-001:
---                     FETCH executes PC <= PC + 1 with PC = 15 while PC is declared
---                     "integer range 0 to 15" (rtl/proc_8.vhd:145), which is a
---                     bound check failure in simulation.
+--                     FETCH of ROM[15] wraps PC modulo 16 (rtl/proc_8.vhd:145) before
+--                     DECODE detects HALT, so this boundary runs cleanly.
 
 library ieee;
 use ieee.std_logic_1164.all;
@@ -217,7 +215,7 @@ begin
         else
             run_program(N_RESULTS);
             step("WRITEBACK");
-            report "KD-001 PROBE: " & integer'image(N_RESULTS) &
+            report "HALT BOUNDARY: " & integer'image(N_RESULTS) &
                    " results verified; next rising edge is FETCH of ROM[15] (HALT) with PC=15";
             ir := PROGRAM(pc);
             pc := pc + 1;
