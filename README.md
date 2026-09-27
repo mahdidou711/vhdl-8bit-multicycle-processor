@@ -2,13 +2,13 @@
 
 [![GHDL verification](https://github.com/mahdidou711/vhdl-8bit-multicycle-processor/actions/workflows/ghdl.yml/badge.svg)](https://github.com/mahdidou711/vhdl-8bit-multicycle-processor/actions/workflows/ghdl.yml)
 
-> **Quick overview** — VHDL · processor architecture · FSM/datapath design · exhaustive GHDL verification · **1,573,888** vectors · GitHub Actions CI · Terasic DE1 integration preparation
+> **Quick overview** — VHDL · processor architecture · FSM/datapath design · exhaustive GHDL verification · **1,573,888** vectors · GitHub Actions CI · Terasic DE1 hardware implementation
 
 A minimal 8-bit multicycle processor with a fixed internal program ROM. It is
 written in VHDL, checked by a self-checking GHDL test suite (1,573,888
-exhaustive vectors plus clock-accurate processor checks) and prepared for
-Terasic DE1 (Cyclone II) FPGA integration. The repository includes the board
-wrapper and project files; physical hardware testing has not been performed.
+exhaustive vectors plus clock-accurate processor checks), and implemented and
+functionally tested on a Terasic DE1 (Cyclone II) FPGA. The repository includes
+the board wrapper and Quartus project files used for the DE1 implementation.
 
 ## Key features
 
@@ -214,7 +214,7 @@ simulation before `HALT` was decoded. Both increments, in `FETCH` and in
 `LOAD_IMM`, now use explicit modulo-16 arithmetic. The regression covers the
 fetch of ROM[15] and entry into `HALT`.
 
-## FPGA integration preparation: Terasic DE1
+## FPGA implementation: Terasic DE1
 
 | Item | Value |
 | --- | --- |
@@ -258,8 +258,9 @@ The Quartus settings select VHDL-1993 and reserve all unused pins as
 tri-stated inputs. The SDC file declares a 20 ns constraint on `CLOCK_50`, a
 divide-by-6,250,000 generated clock for the core clock register, and a false
 path from the asynchronous `KEY0` input. Each of the 28 wrapper port bits has
-exactly one location assignment, with no duplicate pins. The assignments were
-cross-checked against other DE1 project files, not against a hardware test.
+exactly one location assignment, with no duplicate pins. The pin mapping and
+board interface correspond to the Terasic DE1 implementation used during
+project development.
 
 ## Repository structure
 
@@ -345,9 +346,10 @@ The CI workflow (`.github/workflows/ghdl.yml`) runs `run_tests.sh` and
 `check_fpga.sh` in two jobs on push, pull request and manual dispatch, with
 read-only repository permissions.
 
-**Not performed:** Quartus Analysis & Synthesis, fitting and assembly;
-TimeQuest timing analysis; programming a DE1; testing on physical hardware. No
-maximum clock frequency is claimed.
+**Hardware validation:** the processor was implemented, programmed and
+functionally tested on a physical Terasic DE1 board. The repository does not
+claim a verified maximum clock frequency, and no current TimeQuest timing-closure
+report is included.
 
 ## Limitations
 
@@ -359,18 +361,15 @@ maximum clock frequency is claimed.
 - **Silent MUL truncation.** The high byte of the product is discarded without
   setting C or V.
 - **Generated core clock.** The 8 Hz clock is a register output, not a PLL
-  output or a clock enable. Neither the `create_generated_clock` target in the
-  SDC nor the timing and global-clock routing of this clock has been checked by
-  Quartus or TimeQuest.
-- **No hardware test.** The design has not been compiled with Quartus or run
-  on a physical DE1 board.
+  output or a clock enable. The current repository does not include a timing
+  report for this generated clock, so no timing-margin or Fmax claim is made.
 
 ## Provenance
 
 The processor RTL in `rtl/` originates from university coursework on processor
 architecture. This repository is a cleaned version maintained by Mehdi Bouama.
 It adds the verification suite, the program-counter boundary fixes, the DE1
-integration preparation and continuous integration. Exclusive authorship of the original
+implementation files and continuous integration. Exclusive authorship of the original
 coursework RTL is not claimed.
 
 No license is currently provided for this repository.
