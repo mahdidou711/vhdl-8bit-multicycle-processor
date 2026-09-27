@@ -2,10 +2,13 @@
 
 [![GHDL verification](https://github.com/mahdidou711/vhdl-8bit-multicycle-processor/actions/workflows/ghdl.yml/badge.svg)](https://github.com/mahdidou711/vhdl-8bit-multicycle-processor/actions/workflows/ghdl.yml)
 
+> **Quick overview** — VHDL · processor architecture · FSM/datapath design · exhaustive GHDL verification · **1,573,888** vectors · GitHub Actions CI · Terasic DE1 integration preparation
+
 A minimal 8-bit multicycle processor with a fixed internal program ROM. It is
 written in VHDL, checked by a self-checking GHDL test suite (1,573,888
-exhaustive vectors plus clock-accurate processor checks) and packaged as a
-Terasic DE1 (Cyclone II) FPGA demo.
+exhaustive vectors plus clock-accurate processor checks) and prepared for
+Terasic DE1 (Cyclone II) FPGA integration. The repository includes the board
+wrapper and project files; physical hardware testing has not been performed.
 
 ## Key features
 
@@ -211,7 +214,7 @@ simulation before `HALT` was decoded. Both increments, in `FETCH` and in
 `LOAD_IMM`, now use explicit modulo-16 arithmetic. The regression covers the
 fetch of ROM[15] and entry into `HALT`.
 
-## FPGA integration: Terasic DE1
+## FPGA integration preparation: Terasic DE1
 
 | Item | Value |
 | --- | --- |
@@ -367,7 +370,7 @@ maximum clock frequency is claimed.
 The processor RTL in `rtl/` originates from university coursework on processor
 architecture. This repository is a cleaned version maintained by Mehdi Bouama.
 It adds the verification suite, the program-counter boundary fixes, the DE1
-integration and continuous integration. Exclusive authorship of the original
+integration preparation and continuous integration. Exclusive authorship of the original
 coursework RTL is not claimed.
 
 No license is currently provided for this repository.
