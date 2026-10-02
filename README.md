@@ -2,13 +2,14 @@
 
 [![GHDL verification](https://github.com/mahdidou711/vhdl-8bit-multicycle-processor/actions/workflows/ghdl.yml/badge.svg)](https://github.com/mahdidou711/vhdl-8bit-multicycle-processor/actions/workflows/ghdl.yml)
 
-> **Quick overview** — VHDL · processor architecture · FSM/datapath design · exhaustive GHDL verification · **1,573,888** vectors · GitHub Actions CI · Terasic DE1 hardware implementation
+> **Quick overview** — VHDL · processor architecture · verification & DE1 port preparation · exhaustive GHDL ALU verification · **1,573,888** ALU/sub-unit vectors · GitHub Actions CI
 
-A minimal 8-bit multicycle processor with a fixed internal program ROM. It is
-written in VHDL, checked by a self-checking GHDL test suite (1,573,888
-exhaustive vectors plus clock-accurate processor checks), and implemented and
-functionally tested on a Terasic DE1 (Cyclone II) FPGA. The repository includes
-the board wrapper and Quartus project files used for the DE1 implementation.
+A minimal 8-bit multicycle processor with a fixed internal program ROM,
+extending an existing university RTL design. It is checked by a self-checking
+GHDL test suite (1,573,888 exhaustive vectors across the ALU and sub-units,
+plus an 8-testbench edge-by-edge regression) and prepared for a Terasic DE1
+(Cyclone II) FPGA port. The repository includes the board wrapper and Quartus
+project files prepared for the DE1 target.
 
 ## Key features
 
@@ -214,7 +215,7 @@ simulation before `HALT` was decoded. Both increments, in `FETCH` and in
 `LOAD_IMM`, now use explicit modulo-16 arithmetic. The regression covers the
 fetch of ROM[15] and entry into `HALT`.
 
-## FPGA implementation: Terasic DE1
+## FPGA port preparation: Terasic DE1
 
 | Item | Value |
 | --- | --- |
@@ -259,8 +260,7 @@ tri-stated inputs. The SDC file declares a 20 ns constraint on `CLOCK_50`, a
 divide-by-6,250,000 generated clock for the core clock register, and a false
 path from the asynchronous `KEY0` input. Each of the 28 wrapper port bits has
 exactly one location assignment, with no duplicate pins. The pin mapping and
-board interface correspond to the Terasic DE1 implementation used during
-project development.
+board interface correspond to the Terasic DE1 port preparation.
 
 ## Repository structure
 
@@ -330,7 +330,7 @@ The script runs two analysis passes:
    unbound. `-frelaxed` applies the VHDL-2002 default binding rule, which
    binds each one to the entity of the same name in `work`.
 
-## FPGA validation
+## FPGA verification & static checks
 
 ```bash
 ./sim/ghdl/check_fpga.sh
@@ -346,10 +346,13 @@ The CI workflow (`.github/workflows/ghdl.yml`) runs `run_tests.sh` and
 `check_fpga.sh` in two jobs on push, pull request and manual dispatch, with
 read-only repository permissions.
 
-**Hardware validation:** the processor was implemented, programmed and
-functionally tested on a physical Terasic DE1 board. The repository does not
-claim a verified maximum clock frequency, and no current TimeQuest timing-closure
-report is included.
+**Hardware status & coursework experience:** an earlier version of this design
+ran on a physical Terasic DE1 board during university coursework (author
+attestation only). That earlier version predates the modulo-16 program-counter
+fix; the current fixed revision and the current public wrapper are prepared and
+statically reviewed, but are not tested on physical board hardware. The
+repository does not claim timing closure or a verified maximum clock
+frequency (Fmax).
 
 ## Limitations
 
@@ -366,10 +369,13 @@ report is included.
 
 ## Provenance
 
-The processor RTL in `rtl/` originates from university coursework on processor
-architecture. This repository is a cleaned version maintained by Mehdi Bouama.
-It adds the verification suite, the program-counter boundary fixes, the DE1
-implementation files and continuous integration. Exclusive authorship of the original
-coursework RTL is not claimed.
+This repository extends and adapts an existing RTL design from university
+coursework on processor architecture; the complete processor was not built from
+scratch. The processor's control FSM, ALU, and datapath architecture originate
+from the coursework design. Mehdi Bouama contributed the verification
+environment (all eight GHDL testbenches and the independent reference model in
+`tb/tb_pkg.vhd`), the program-counter modulo-16 boundary fix, the Terasic DE1
+port preparation, continuous integration, and documentation. Exclusive
+authorship of the original coursework RTL is not claimed.
 
 No license is currently provided for this repository.
