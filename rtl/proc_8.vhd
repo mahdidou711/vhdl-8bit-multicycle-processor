@@ -4,8 +4,8 @@ use IEEE.STD_LOGIC_1164.ALL;
 
 entity proc_8 is
     port (
-        clk   : in  std_logic;                    -- Horloge systeme (CLOCK_50 sur DE1)
-        reset : in  std_logic;                    -- Reset asynchrone actif bas (KEY(0) sur DE1)
+        clk   : in  std_logic;                    -- Horloge du processeur, fournie par le module appelant
+        reset : in  std_logic;                    -- Reset asynchrone actif a '0'
         -- Ports de sortie ajoutes pour l'observation sur carte
         R_out : out std_logic_vector(7 downto 0); -- Registre resultat -> LEDR(7:0)
         Z_out : out std_logic;                    -- Flag Zero        -> LEDG(0)
